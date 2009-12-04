@@ -12,7 +12,7 @@ use vars qw($VERSION $DEBUG);
 use base qw(Class::Accessor::Fast);
 
 my @methods = qw(results results_xml uri xmlns proxy soapversion timeout error
-  strip_default_xmlns encoding);
+    strip_default_xmlns encoding header);
 
 # wsdk
 
@@ -20,7 +20,7 @@ __PACKAGE__->mk_accessors(@methods);
 
 $DEBUG = 0;
 
-$VERSION = 2.0;
+$VERSION = 2.1;
 
 # Get an XML Parser
 my $parser = XML::LibXML->new();
@@ -28,8 +28,8 @@ $parser->validation(0);
 $parser->expand_entities(0);
 
 # which methods should be set on object constructor
-my @config_methods =
-  qw(uri xmlns proxy soapversion strip_default_xmlns encoding);
+my @config_methods
+    = qw(uri xmlns proxy soapversion strip_default_xmlns encoding);
 
 sub new {
     my ( $proto, $conf ) = @_;
@@ -41,7 +41,7 @@ sub new {
     $conf->{soapversion} = '1.1' unless defined $conf->{soapversion};
     $conf->{timeout}     = '30'  unless defined $conf->{timeout};
     $conf->{strip_default_xmlns} = 1
-      unless defined $conf->{strip_default_xmlns};
+        unless defined $conf->{strip_default_xmlns};
     $conf->{encoding} ||= 'utf-8';
 
     # There is a WDSL file - process it
@@ -62,11 +62,12 @@ sub new {
     foreach my $soap_conf (@config_methods) {
         unless ( defined $conf->{$soap_conf} ) {
             croak "$soap_conf is required";
-        }
-        else {
+        } else {
             $self->$soap_conf( $conf->{$soap_conf} );
         }
     }
+
+    $self->header( $conf->{header} ) if $conf->{header};
 
     # Set up the SOAP object
     $self->{soap} = SOAP::Lite->new;
@@ -120,8 +121,7 @@ sub fetch {
         unless ( -r $conf->{filename} ) {
             $self->error( "Unable to read: " . $conf->{filename} );
             return undef;
-        }
-        else {
+        } else {
 
             # Ok, read it in
             my $file_xml = read_file( $conf->{filename} );
@@ -135,8 +135,8 @@ sub fetch {
     unless ( $conf->{xml} eq '' ) {
 
         # add some wrapping paper so XML::LibXML likes it with no top level
-        my $xml_data =
-          '<soap_lite_wrapper>' . $conf->{xml} . '</soap_lite_wrapper>';
+        my $xml_data
+            = '<soap_lite_wrapper>' . $conf->{xml} . '</soap_lite_wrapper>';
         my $xml;
         eval { $xml = $parser->parse_string($xml_data) };
         if ($@) {
@@ -176,8 +176,7 @@ sub fetch {
         # Got a web error - if it was XML it wouldn't start with a digit!
         $self->error($res);
         return undef;
-    }
-    else {
+    } else {
 
         # Strip out default name space stuff as it makes it hard
         # to parse and there's no reason for it I can see!
@@ -191,8 +190,7 @@ sub fetch {
             # Not valid xml
             $self->error('Unable to parse returned data as XML');
             return undef;
-        }
-        else {
+        } else {
 
             # Now look for faults
             if ( my $nodes = $res_xml->findnodes("//faultstring") ) {
@@ -256,8 +254,7 @@ sub _process_node {
         # Check if it's our 'special' value
         if ( $att->name() eq '_value_type' ) {
             $type = $att->value();
-        }
-        else {
+        } else {
             $attribs{ $att->name() } = $att->value();
         }
     }
@@ -272,7 +269,8 @@ sub _process_node {
 
         #return;
         my $value = $conf->{node}->childNodes()->get_node(1)->textContent();
-        carp "ADDING : " . $conf->{node}->nodeName . " Value: $value" if $DEBUG;
+        carp "ADDING : " . $conf->{node}->nodeName . " Value: $value"
+            if $DEBUG;
         $self->{sdb}->add_elem(
             name       => $conf->{node}->nodeName,
             attributes => \%attribs,
@@ -282,15 +280,14 @@ sub _process_node {
         );
 
         carp "END OF THE LINE BUDDY!" if $DEBUG;
-    }
-    else {
+    } else {
         carp "- FOUND CHILD NODES" if $DEBUG;
 
         # Add it - it's a node without a value, but has child nodes
         my $obj;
         if ( defined $parent ) {
             carp "ADDING ELEMENT WITH PARENT: " . $conf->{node}->nodeName
-              if $DEBUG;
+                if $DEBUG;
 
             # Add with the parent
             $obj = $self->{sdb}->add_elem(
@@ -298,10 +295,9 @@ sub _process_node {
                 attributes => \%attribs,
                 parent     => $parent,
             );
-        }
-        else {
+        } else {
             carp "ADDING ELEMENT WITH NO PARENT: " . $conf->{node}->nodeName
-              if $DEBUG;
+                if $DEBUG;
 
             # Add with the parent
             # Add without parent
@@ -316,8 +312,7 @@ sub _process_node {
             # process each child node as long as it's not
             # a text node (type 3)
             $self->_process_node(
-                {
-                    'node'   => $node,
+                {   'node'   => $node,
                     'parent' => $obj,
                 }
             );
@@ -384,6 +379,20 @@ in disable_base64:
    ...
      disable_base64 => 1,
    ...
+
+=head2 header()
+ 
+   my $header = SOAP::Header->name(
+          SomeDomain => {
+              Username => "a_user",
+              Password => 'xxxxx',
+          }
+      )->uri('http://www.thedomain.com/')->prefix('');
+
+    $soap_client->header($header);
+
+Add a soap header to the soap call, probably useful if there is
+credential based authenditcation
 
 =head2 fetch()
 
@@ -500,6 +509,10 @@ to one of the other ones and see if that helps.
 =head1 AUTHOR
 
 Leo Lapworth <LLAP@cuckoo.org>
+
+=head1 REPOSITORY
+
+http://github.com/ranguard/soap-xml-client
 
 =head1 COPYRIGHT
 

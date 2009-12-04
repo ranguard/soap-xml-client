@@ -7,36 +7,38 @@ use base qw(SOAP::XML::Client);
 
 # The actual call to a .net server
 sub _call {
-	my ($self,$method) = @_;
+    my ( $self, $method ) = @_;
 
-	# No, I don't know why this has to be a sub, it just does,
-	# it's to do with the on_action which .net requires so it
-	# submits as $uri/$method, rather than $uri#$method	
-	my $soap_action = sub {return $self->uri() . '/' . $method};
+    # No, I don't know why this has to be a sub, it just does,
+    # it's to do with the on_action which .net requires so it
+    # submits as $uri/$method, rather than $uri#$method
+    my $soap_action = sub { return $self->uri() . '/' . $method };
 
-	my $caller;
-	eval {
-	   $caller = $self->{soap}
-			->uri($self->uri())
-			->proxy($self->proxy(), timeout => $self->timeout())
-                        ->encoding($self->encoding)
-                        ->on_action( $soap_action );
-	};
-	if($@) {
-		print "uri:" . $self->uri . "\n";
-		die "Here" . $@;
-	}
+    my $caller;
+    eval {
+        $caller
+            = $self->{soap}->uri( $self->uri() )
+            ->proxy( $self->proxy(), timeout => $self->timeout() )
+            ->encoding( $self->encoding )->on_action($soap_action);
+    };
+    if ($@) {
+        warn "error for uri:" . $self->uri . "\n";
+        die $@;
+    }
 
+    $caller->soapversion( $self->soapversion() );
 
-	$caller->soapversion($self->soapversion());
+    # Create a SOAP::Data node for the method name
+    my $method_name
+        = SOAP::Data->name($method)->attr( { 'xmlns' => $self->xmlns() } );
 
-	# Create a SOAP::Data node for the method name
-	my $method_name = SOAP::Data->name($method)->attr({'xmlns' => $self->xmlns()});
+    my @params = ( $self->{sdb}->to_soap_data() );
+    unshift( @params, $self->header() ) if $self->header();
 
-	# Execute the SOAP Request and get the resulting XML
-	my $res = $caller->call( $method_name => $self->{sdb}->to_soap_data());
+    # Execute the SOAP Request and get the resulting XML
+    my $res = $caller->call( $method_name => @params );
 
-	return $res;
+    return $res;
 
 }
 
@@ -134,6 +136,20 @@ supplied, otherwise it will croak.
 strip_default_xmlns is used to remove xmlns="http://.../"
 from returned XML, it will NOT alter xmlns:FOO="http//.../"
 set to '0' if you do not wish for this to happen.
+
+=head2 header()
+ 
+   my $header = SOAP::Header->name(
+          SomeDomain => {
+              Username => "a_user",
+              Password => 'xxxxx',
+          }
+      )->uri('http://www.thedomain.com/')->prefix('');
+
+    $soap_client->header($header);
+
+Add a soap header to the soap call, probably useful if there is
+credential based authenditcation
 
 =head2 fetch()
 

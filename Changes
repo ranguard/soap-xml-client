@@ -1,5 +1,9 @@
 Revision history
 
+2.1 Fri  4 Dec 11:42:33 GMT 2009
+    - Add a header() so you can add a SOAP::Header objects to use
+    - get embarrassed by the code, but it refractor left for another day
+
 2.0 Sun Feb 18 15:09:06 GMT 2007
 	- Replace s/xmlns=".+?"//g with s/xmlns=".*?"//g 
       for servers sending xmlns="", thanks to David Hall 

@@ -7,15 +7,17 @@ use base qw(SOAP::XML::Client);
 
 # Actually do the call
 sub _call {
-	my ($self,$method) = @_;
+    my ( $self, $method ) = @_;
 
-	my $res = $self->{soap}
- 			->uri($self->uri())
-			->proxy($self->proxy(), timeout => $self->timeout())
-			->soapversion($self->soapversion())
-                        ->encoding($self->encoding)
-			->$method( $self->{sdb}->to_soap_data() );
-	return $res;
+    my @params = ( $self->{sdb}->to_soap_data() );
+    unshift( @params, $self->header() ) if $self->header();
+
+    my $res
+        = $self->{soap}->uri( $self->uri() )
+        ->proxy( $self->proxy(), timeout => $self->timeout() )
+        ->soapversion( $self->soapversion() )->encoding( $self->encoding )
+        ->$method(@params);
+    return $res;
 }
 
 1;
@@ -110,6 +112,20 @@ supplied, otherwise it will croak.
 strip_default_xmlns is used to remove xmlns="http://.../"
 from returned XML, it will NOT alter xmlns:FOO="http//.../"
 set to '0' if you do not wish for this to happen.
+
+=head2 header()
+ 
+   my $header = SOAP::Header->name(
+          SomeDomain => {
+              Username => "a_user",
+              Password => 'xxxxx',
+          }
+      )->uri('http://www.thedomain.com/')->prefix('');
+
+    $soap_client->header($header);
+
+Add a soap header to the soap call, probably useful if there is
+credential based authenditcation
 
 =head2 fetch()
 
