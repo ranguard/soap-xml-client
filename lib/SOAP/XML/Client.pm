@@ -6,6 +6,7 @@ use XML::LibXML;
 use SOAP::Lite;
 use SOAP::Data::Builder;
 use File::Slurp;
+use Encode qw( encode decode );
 
 use vars qw($VERSION $DEBUG);
 
@@ -169,6 +170,9 @@ sub fetch {
     # execute the call in the relevant style done by the child object
     my $res = $self->_call( $conf->{method} );
 
+# TODO: actually need to specify encoding expected in return (or parse from response?)
+    $res = decode( $self->{encoding}, $res );
+
     carp "After run _call()" if $DEBUG;
 
     if ( !defined $res or $res =~ /^\d/ ) {
@@ -255,7 +259,8 @@ sub _process_node {
         if ( $att->name() eq '_value_type' ) {
             $type = $att->value();
         } else {
-            $attribs{ $att->name() } = $att->value();
+            $attribs{ $att->name() }
+                = encode( $self->{encoding}, $att->value() );
         }
     }
 
@@ -275,7 +280,7 @@ sub _process_node {
             name       => $conf->{node}->nodeName,
             attributes => \%attribs,
             parent     => $parent,
-            value      => $value,
+            value      => encode( $self->{encoding}, $value ),
             type       => $type,
         );
 
@@ -355,7 +360,7 @@ It's designed to be REALLY simple to use.
     proxy 	=> 'http://www.yourproxy.com/services/services.asmx',
     xmlns 	=> 'http://www.yourdomain.com/services',
     soapversion => '1.1',     # defaults to 1.1
-    timeout	=> '30',      # detauls to 30 seconds
+    timeout	=> '30',          # defaults to 30 seconds
     strip_default_xmlns => 1, # defaults to 1
   });
 
