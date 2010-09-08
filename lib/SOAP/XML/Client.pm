@@ -351,18 +351,21 @@ It's designed to be REALLY simple to use.
   If you are creating a child class you just need to
   impliment the actual _call() - see pod below.
 
-=head1 methods
+=head1 METHODS
 
 =head2 new()
 
-  my $soap_client = SOAP::XML::Client::DotNet->new({
-    uri 	=> 'http://www.yourdomain.com/services',
-    proxy 	=> 'http://www.yourproxy.com/services/services.asmx',
-    xmlns 	=> 'http://www.yourdomain.com/services',
-    soapversion => '1.1',     # defaults to 1.1
-    timeout	=> '30',          # defaults to 30 seconds
-    strip_default_xmlns => 1, # defaults to 1
-  });
+  my $soap_client = SOAP::XML::Client::DotNet->new(
+    {   uri   => 'http://www.yourdomain.com/services',
+        proxy => 'http://www.yourproxy.com/services/services.asmx',
+        xmlns => 'http://www.yourdomain.com/services',
+        soapversion         => '1.1',    # defaults to 1.1
+        timeout             => '30',     # defaults to 30 seconds
+        strip_default_xmlns => 1,        # defaults to 1
+        encoding => 'utf-8',    # defaults to 'utf-8' (see 'Encoding' below)
+    }
+  );
+
 
 This constructor requires uri, proxy and xmlns to be
 supplied, otherwise it will croak.
@@ -370,13 +373,6 @@ supplied, otherwise it will croak.
 strip_default_xmlns is used to remove xmlns="http://.../"
 from returned XML, it will NOT alter xmlns:FOO="http//.../"
 set to '0' if you do not wish for this to happen.
-
-If you pass an encoding option then the SOAP message will be flagged
-as that encoding (this defaults to UTF8):
-
-   ...
-     encoding => 'iso-8859-1',
-   ...
 
 To stop SOAP::Lite being overly keen to encode values as Base64, pass
 in disable_base64:
@@ -506,6 +502,29 @@ to one of the other ones and see if that helps.
   }
 
   1;
+
+=head1 ENCODING
+
+Encoding defaults to UTF-8, but can be overidden by the 'encoding' argument
+to the constructor. The encoding setting is used to flag the SOAP message
+(e.g. C<<?xml version="1.0" encoding="utf-8"?>>), and to encode and decode
+the sent and received data between the chosen character encoding and internal
+Perl string format.
+
+Field values and attribute values are encoded (using C<Encode::encode>) to
+the chosen character encoding during the SOAP message creation, and the
+entire returned string is decoded (using C<Encode::decode>) from the chosen
+character encoding once received.
+
+Note that this currently expects that the returned message will be in the
+same character encoding - it does not parse the response for an 'encoding'
+attribute.
+
+=head2 BUGS
+
+You may encounter problems with twice encoded or decoded characters if code
+using this package is encoding data prior to the call or decoding the
+response.
 
 =head1 SEE ALSO
 
