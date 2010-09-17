@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
-use blib;
+use warnings;
 
 use Test::More tests => 7;
 
