@@ -1,5 +1,8 @@
 Revision history
 
+2.2 Fri Sep 17 14:54:08 BST 2010
+    - Add even better encoding (mjemmeson patch)
+
 2.1 Fri  4 Dec 11:42:33 GMT 2009
     - Add a header() so you can add a SOAP::Header objects to use
     - get embarrassed by the code, but it refractor left for another day

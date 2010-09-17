@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-my $VERSION = '2.1';
+my $VERSION = '2.2';
 
 my $ABSTRACT = "Module for simply interacting with SOAP webservices";
 
@@ -8,7 +8,7 @@ WriteMakefile(
     'NAME'      => 'SOAP::XML::Client',
     'ABSTRACT'  => $ABSTRACT,
     'AUTHOR'    => 'Leo Lapworth',
-    'VERSION'   => $VERSION,              # finds $VERSION
+    'VERSION_FROM' => 'lib/SOAP/XML/Client.pm',
     'PREREQ_PM' => {
         'Class::Accessor::Fast' => 0.19,
         'Encode'                => 0,

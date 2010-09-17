@@ -21,7 +21,7 @@ __PACKAGE__->mk_accessors(@methods);
 
 $DEBUG = 0;
 
-$VERSION = 2.1;
+$VERSION = 2.2;
 
 # Get an XML Parser
 my $parser = XML::LibXML->new();
