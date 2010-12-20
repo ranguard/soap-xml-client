@@ -1,5 +1,8 @@
 Revision history
 
+2.3 Mon Dec 20 16:56:10 GMT 2010
+    - removed encode() from sending in SOAP::XML::Client  (mjemmeson patch)
+
 2.2 Fri Sep 17 14:54:08 BST 2010
     - Add even better encoding (mjemmeson patch)
 
