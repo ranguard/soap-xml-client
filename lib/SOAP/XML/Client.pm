@@ -6,7 +6,7 @@ use XML::LibXML;
 use SOAP::Lite;
 use SOAP::Data::Builder;
 use File::Slurp;
-use Encode qw( encode decode );
+use Encode qw( decode );
 
 use vars qw($VERSION $DEBUG);
 
@@ -259,8 +259,7 @@ sub _process_node {
         if ( $att->name() eq '_value_type' ) {
             $type = $att->value();
         } else {
-            $attribs{ $att->name() }
-                = encode( $self->{encoding}, $att->value() );
+            $attribs{ $att->name() } = $att->value();
         }
     }
 
@@ -280,7 +279,7 @@ sub _process_node {
             name       => $conf->{node}->nodeName,
             attributes => \%attribs,
             parent     => $parent,
-            value      => encode( $self->{encoding}, $value ),
+            value      => $value,
             type       => $type,
         );
 
@@ -507,14 +506,11 @@ to one of the other ones and see if that helps.
 
 Encoding defaults to UTF-8, but can be overidden by the 'encoding' argument
 to the constructor. The encoding setting is used to flag the SOAP message
-(e.g. C<<?xml version="1.0" encoding="utf-8"?>>), and to encode and decode
-the sent and received data between the chosen character encoding and internal
-Perl string format.
+(e.g. C<<?xml version="1.0" encoding="utf-8"?>>), and to decode the received
+data between the chosen character encoding and internal Perl string format.
 
-Field values and attribute values are encoded (using C<Encode::encode>) to
-the chosen character encoding during the SOAP message creation, and the
-entire returned string is decoded (using C<Encode::decode>) from the chosen
-character encoding once received.
+Field values and attribute values are no longer encoded (as in v2.2), since
+this now appears to be handled correctly by C<XML::LibXML> and C<SOAP::Lite>.
 
 Note that this currently expects that the returned message will be in the
 same character encoding - it does not parse the response for an 'encoding'
