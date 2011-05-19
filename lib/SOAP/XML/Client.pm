@@ -192,7 +192,7 @@ sub fetch {
         if ($@) {
 
             # Not valid xml
-            $self->error('Unable to parse returned data as XML');
+            $self->error('Unable to parse returned data as XML: ' . $@);
             return undef;
         } else {
 

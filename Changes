@@ -1,5 +1,7 @@
 Revision history
 
+- Add XML Parser warning message to returned error - helps with debugging
+
 2.3 Mon Dec 20 16:56:10 GMT 2010
     - removed encode() from sending in SOAP::XML::Client  (mjemmeson patch)
 
