@@ -12,12 +12,13 @@ sub _call {
     my @params = ( $self->{sdb}->to_soap_data() );
     unshift( @params, $self->header() ) if $self->header();
 
-    my $res
+    my $caller
         = $self->{soap}->uri( $self->uri() )
         ->proxy( $self->proxy(), timeout => $self->timeout() )
-        ->soapversion( $self->soapversion() )->encoding( $self->encoding )
-        ->$method(@params);
-    return $res;
+        ->soapversion( $self->soapversion() )->encoding( $self->encoding );
+
+    my $res = $caller->$method(@params);
+    return $res, $caller->transport;
 }
 
 1;

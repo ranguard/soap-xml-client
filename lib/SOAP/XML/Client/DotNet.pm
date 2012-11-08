@@ -38,8 +38,7 @@ sub _call {
     # Execute the SOAP Request and get the resulting XML
     my $res = $caller->call( $method_name => @params );
 
-    return $res;
-
+    return $res, $caller->transport;
 }
 
 1;
@@ -114,7 +113,7 @@ and does not put in namesp<X>
   } else {
     # Got an error
     print "Problem using service:" . $soap_client->error();
-
+    print "Status: " . $soap_client->status();
   }
 
 =head1 methods
@@ -189,7 +188,16 @@ anything else you'll need to check for yourself.
 
   $soap_client->error();
 
-If fetch returns undef then check this method, it will either be that the filename you supplied couldn't be read, the XML you supplied was not correctly formatted (XML::LibXML could not parse it), there was a transport error with the web service or Fault/faultstring was found in the XML returned.
+If fetch returns undef then check this method, it will either be that the 
+filename you supplied couldn't be read, the XML you supplied was not correctly 
+formatted (XML::LibXML could not parse it), there was a transport error with 
+the web service or Fault/faultstring was found in the XML returned.
+
+=head2 status()
+
+  $soap_client->status();
+  
+This is set to the http status after fetch has been called
 
 =head2 results();
 
@@ -201,8 +209,8 @@ Can be called after fetch() to get the raw XML, if fetch was sucessful.
 
   my $results_as_xml = $soap_client->results_xml();
 
-Can be called after fetch() to get the XML::LibXML Document element of the returned
-xml, as long as fetch was sucessful.
+Can be called after fetch() to get the XML::LibXML Document element of the 
+returned xml, as long as fetch was sucessful.
 
 =head1 HOW TO DEBUG
 

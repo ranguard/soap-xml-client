@@ -13,7 +13,7 @@ use vars qw($VERSION $DEBUG);
 use base qw(Class::Accessor::Fast);
 
 my @methods = qw(results results_xml uri xmlns proxy soapversion timeout error
-    strip_default_xmlns encoding header);
+    strip_default_xmlns encoding header status);
 
 # wsdk
 
@@ -21,7 +21,7 @@ __PACKAGE__->mk_accessors(@methods);
 
 $DEBUG = 0;
 
-$VERSION = 2.3;
+$VERSION = 2.5;
 
 # Get an XML Parser
 my $parser = XML::LibXML->new();
@@ -30,7 +30,7 @@ $parser->expand_entities(0);
 
 # which methods should be set on object constructor
 my @config_methods
-    = qw(uri xmlns proxy soapversion strip_default_xmlns encoding);
+    = qw(uri xmlns proxy soapversion strip_default_xmlns encoding timeout);
 
 sub new {
     my ( $proto, $conf ) = @_;
@@ -56,7 +56,7 @@ sub new {
             my $self = shift;
             my ( $value, $name, $type, $attr ) = @_;
             return [ $name, { 'xsi:type' => 'xsd:string', %$attr },
-                     SOAP::Utils::encode_data($value)
+                    SOAP::Utils::encode_data($value)
             ];
         };
     }
@@ -170,14 +170,16 @@ sub fetch {
 #print Dumper($self->{sdb}->elems());
 
     # execute the call in the relevant style done by the child object
-    my $res = $self->_call( $conf->{method} );
+    my ( $res, $transport ) = $self->_call( $conf->{method} );
+
+    $self->status( $transport->status );
 
 # TODO: actually need to specify encoding expected in return (or parse from response?)
     $res = decode( $self->{encoding}, $res );
 
     carp "After run _call()" if $DEBUG;
 
-    if ( !defined $res or $res =~ /^\d/ ) {
+    if ( !defined $res or $res =~ /^\d/ or !$transport->is_success ) {
 
         # Got a web error - if it was XML it wouldn't start with a digit!
         $self->error($res);
@@ -194,7 +196,7 @@ sub fetch {
         if ($@) {
 
             # Not valid xml
-            $self->error('Unable to parse returned data as XML: ' . $@);
+            $self->error( 'Unable to parse returned data as XML: ' . $@ );
             return undef;
         } else {
 
@@ -413,6 +415,7 @@ credential based authenditcation
   } else {
       # There was some sort of error
       print $soap_client->error() . "\n";
+      print "Status: " . $soap_client->status();
   }
 
 This method actually calls the web service, it takes a method name
@@ -438,6 +441,12 @@ If fetch returns undef then check this method, it will either be that the filena
 supplied couldn't be read, the XML you supplied was not correctly formatted (XML::LibXML 
 could not parse it), there was a transport error with the web service or Fault/faultstring
 was found in the XML returned.
+
+=head2 status()
+
+  $soap_client->status();
+  
+This is set to the http status after fetch has been called
 
 =head2 results();
 
