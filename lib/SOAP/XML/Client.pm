@@ -2,13 +2,13 @@ package SOAP::XML::Client;
 
 use strict;
 use Carp;
-use XML::LibXML;
-use SOAP::Lite;
-use SOAP::Data::Builder;
+use XML::LibXML 0.6;
+use SOAP::Lite 0.67;
+use SOAP::Data::Builder 0.8;
 use File::Slurp;
 use Encode qw( decode );
 
-use vars qw($VERSION $DEBUG);
+use vars qw($DEBUG);
 
 use base qw(Class::Accessor::Fast);
 
@@ -20,8 +20,6 @@ my @methods = qw(results results_xml uri xmlns proxy soapversion timeout error
 __PACKAGE__->mk_accessors(@methods);
 
 $DEBUG = 0;
-
-$VERSION = 2.5;
 
 # Get an XML Parser
 my $parser = XML::LibXML->new();
@@ -55,8 +53,10 @@ sub new {
         *SOAP::Serializer::as_base64Binary = sub {
             my $self = shift;
             my ( $value, $name, $type, $attr ) = @_;
-            return [ $name, { 'xsi:type' => 'xsd:string', %$attr },
-                    SOAP::Utils::encode_data($value)
+            return [
+                $name,
+                { 'xsi:type' => 'xsd:string', %$attr },
+                SOAP::Utils::encode_data($value)
             ];
         };
     }
@@ -544,13 +544,6 @@ Leo Lapworth <LLAP@cuckoo.org>
 =head1 REPOSITORY
 
 http://github.com/ranguard/soap-xml-client
-
-=head1 COPYRIGHT
-
-(c) 2005 Leo Lapworth
-
-This library is free software, you can use it under the same 
-terms as perl itself.
 
 =head1 THANKS
 

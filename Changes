@@ -1,6 +1,17 @@
 Revision history
 
-- Add XML Parser warning message to returned error - helps with debugging
+2.6 Thu 8 Nov 2012
+    - encode string data when bypassing base64 conversion (mjemmeson)
+    - switch to distzilla
+    - merge in 2.5 to git repo, seemed to get missed
+
+2.5 Tue Feb  2 2012
+    - Fix for timeout (which never worked!)
+    - Add status() to use after fetch()
+    - Better error checking (if it's a transport fail)
+
+2.4 Wed Jun  1 2010
+    - Add XML Parser warning message to returned error - helps with debugging
 
 2.3 Mon Dec 20 16:56:10 GMT 2010
     - removed encode() from sending in SOAP::XML::Client  (mjemmeson patch)
