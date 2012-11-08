@@ -1,6 +1,8 @@
 Revision history
 
-2.6 Thu 8 Nov 2012
+2.6 Yes, I screwed up and released a lower version!
+
+2.26 Thu 8 Nov 2012
     - encode string data when bypassing base64 conversion (mjemmeson)
     - switch to distzilla
     - merge in 2.5 to git repo, seemed to get missed
