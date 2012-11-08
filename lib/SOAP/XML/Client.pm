@@ -55,7 +55,9 @@ sub new {
         *SOAP::Serializer::as_base64Binary = sub {
             my $self = shift;
             my ( $value, $name, $type, $attr ) = @_;
-            return [ $name, { 'xsi:type' => 'xsd:string', %$attr }, $value ];
+            return [ $name, { 'xsi:type' => 'xsd:string', %$attr },
+                     SOAP::Utils::encode_data($value)
+            ];
         };
     }
 
