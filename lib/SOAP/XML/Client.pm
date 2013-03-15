@@ -407,10 +407,10 @@ credential based authenditcation
 
   if($soap_client->fetch({ method => 'GetActivity', xml => $xml }) {
       # Get result as a string
-      my $xml_string = $soap_client->result();
+      my $xml_string = $soap_client->results();
 
       # Get result as a XML::LibXML object
-      my $xml_libxml_object = $soap_client->result_xml();
+      my $xml_libxml_object = $soap_client->results_xml();
 
   } else {
       # There was some sort of error
