@@ -2,6 +2,7 @@ package SOAP::XML::Client::DotNet;
 
 use strict;
 use Carp;
+use Scalar::Util qw(weaken);
 
 use base qw(SOAP::XML::Client);
 
@@ -12,7 +13,10 @@ sub _call {
     # No, I don't know why this has to be a sub, it just does,
     # it's to do with the on_action which .net requires so it
     # submits as $uri/$method, rather than $uri#$method
-    my $soap_action = sub { return $self->uri() . '/' . $method };
+
+    my $this = $self;
+    weaken($this);    # weaken to avoid circular references
+    my $soap_action = sub { return $this->uri() . '/' . $method };
 
     my $caller;
     eval {
