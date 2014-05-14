@@ -1,5 +1,7 @@
 Revision history
 
+    - minor tweaks to test
+
 2.6 Yes, I screwed up and released a lower version!
 
 2.26 Thu 8 Nov 2012
@@ -26,8 +28,8 @@ Revision history
     - get embarrassed by the code, but it refractor left for another day
 
 2.0 Sun Feb 18 15:09:06 GMT 2007
-	- Replace s/xmlns=".+?"//g with s/xmlns=".*?"//g 
-      for servers sending xmlns="", thanks to David Hall 
+	- Replace s/xmlns=".+?"//g with s/xmlns=".*?"//g
+      for servers sending xmlns="", thanks to David Hall
       for the heads up
 
 1.9 Mon May 29 10:00:39 BST 2006
@@ -59,7 +61,7 @@ Revision history
 	- Updated docs - replacing soap:Fault with Fault/faultstring
 	- Updated docs - lots of minor things and reorganise packages
 	- added 'filename' option, instead of 'xml' for fetch()
-	- fetch() now returns 1 or undef 
+	- fetch() now returns 1 or undef
 		- use $obj->results() or $obj->results_xml() to get data
 
 1.1 Mon 1st Aug 2005
