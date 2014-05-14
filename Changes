@@ -1,5 +1,6 @@
 Revision history
 
+2.7 Wed 14 May 2014
     - various tweaks to tests (rrwo)
     - added tests for memory cycles (rrwo)
     - fixed memory leak (rrwo)
