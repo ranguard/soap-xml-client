@@ -2,6 +2,7 @@ package SOAP::XML::Client::DotNet;
 
 use strict;
 use Carp;
+use Scalar::Util qw(weaken);
 
 use base qw(SOAP::XML::Client);
 
@@ -12,7 +13,10 @@ sub _call {
     # No, I don't know why this has to be a sub, it just does,
     # it's to do with the on_action which .net requires so it
     # submits as $uri/$method, rather than $uri#$method
-    my $soap_action = sub { return $self->uri() . '/' . $method };
+
+    my $this = $self;
+    weaken($this);    # weaken to avoid circular references
+    my $soap_action = sub { return $this->uri() . '/' . $method };
 
     my $caller;
     eval {
@@ -56,12 +60,12 @@ This package helps in talking with .net servers, it just needs
 a bit of XML thrown at it and you get some XML back.
 It's designed to be REALLY simple to use.
 
-You don't need to know this, but the major difference to 
+You don't need to know this, but the major difference to
 'SOAP::XML::Client::Generic' is it will submit as:
 
 SOAPAction: "http://www.yourdomain.com/services/GetSellerActivity"
 
-and does not put in namesp<X> 
+and does not put in namesp<X>
 
 =head1 SYNOPSIS
 
@@ -137,7 +141,7 @@ from returned XML, it will NOT alter xmlns:FOO="http//.../"
 set to '0' if you do not wish for this to happen.
 
 =head2 header()
- 
+
    my $header = SOAP::Header->name(
           SomeDomain => {
               Username => "a_user",
@@ -188,15 +192,15 @@ anything else you'll need to check for yourself.
 
   $soap_client->error();
 
-If fetch returns undef then check this method, it will either be that the 
-filename you supplied couldn't be read, the XML you supplied was not correctly 
-formatted (XML::LibXML could not parse it), there was a transport error with 
+If fetch returns undef then check this method, it will either be that the
+filename you supplied couldn't be read, the XML you supplied was not correctly
+formatted (XML::LibXML could not parse it), there was a transport error with
 the web service or Fault/faultstring was found in the XML returned.
 
 =head2 status()
 
   $soap_client->status();
-  
+
 This is set to the http status after fetch has been called
 
 =head2 results();
@@ -209,7 +213,7 @@ Can be called after fetch() to get the raw XML, if fetch was sucessful.
 
   my $results_as_xml = $soap_client->results_xml();
 
-Can be called after fetch() to get the XML::LibXML Document element of the 
+Can be called after fetch() to get the XML::LibXML Document element of the
 returned xml, as long as fetch was sucessful.
 
 =head1 HOW TO DEBUG
@@ -241,12 +245,12 @@ Leo Lapworth <LLAP@cuckoo.org>
 
 (c) 2005 Leo Lapworth
 
-This library is free software, you can use it under the same 
+This library is free software, you can use it under the same
 terms as perl itself.
 
 =head1 SEE ALSO
 
-  <SOAP::XML::Client::Generic>, <SOAP::XML::Client> 
+  <SOAP::XML::Client::Generic>, <SOAP::XML::Client>
 
 =cut
 
