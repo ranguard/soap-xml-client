@@ -5,6 +5,7 @@ use strict;
 use Carp;
 
 use Test::More;
+use Test::Memory::Cycle;
 
 # use SOAP::Lite ( +trace => 'all', readable => 1, outputxml => 1, );
 
@@ -78,5 +79,10 @@ SKIP: {
     }
 
 }
+
+# Note: this may not detect any memory cycles unless the network test
+# is run.
+
+memory_cycle_ok( $obj, "no circular references" );
 
 done_testing;
