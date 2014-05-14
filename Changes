@@ -2,6 +2,7 @@ Revision history
 
     - various tweaks to tests (rrwo)
     - added tests for memory cycles (rrwo)
+    - fixed memory leak (rrwo)
 
 2.6 Yes, I screwed up and released a lower version!
 
