@@ -13,7 +13,7 @@ use vars qw($DEBUG);
 use base qw(Class::Accessor::Fast);
 
 my @methods = qw(results results_xml uri xmlns proxy soapversion timeout error
-    strip_default_xmlns encoding header status);
+    strip_default_xmlns encoding header transport status);
 
 # wsdk
 
@@ -172,6 +172,7 @@ sub fetch {
     # execute the call in the relevant style done by the child object
     my ( $res, $transport ) = $self->_call( $conf->{method} );
 
+    $self->transport( $transport );
     $self->status( $transport->status );
 
 # TODO: actually need to specify encoding expected in return (or parse from response?)
