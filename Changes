@@ -1,5 +1,8 @@
 Revision history
 
+2.8 Wed 14 Jan 2015
+    - give access to the underlying transport (Anthony Lucas)
+
 2.7 Wed 14 May 2014
     - various tweaks to tests (rrwo)
     - added tests for memory cycles (rrwo)
@@ -91,4 +94,3 @@ Revision history
 
 0.1 Thur 7th July 2005
 	- First public release
-
